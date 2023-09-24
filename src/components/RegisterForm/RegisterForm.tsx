@@ -13,8 +13,21 @@ export default function RegisterForm() {
     return !(!!username && isPasswordMatch());
   }
 
-  const registerButtonClicked = () => {
+  const registerButtonClicked = async () => {
     console.debug({username, password, repeatedPassword, match: isPasswordMatch()});
+    const body = { username, password };
+    const request = new Request("https://tictactoe.aboutdream.io/register/",
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type":"application/json"
+        }
+      }
+    );
+
+    const response = await fetch(request);
+    console.debug({response});
   }
 
   return (
