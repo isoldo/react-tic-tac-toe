@@ -44,25 +44,30 @@ export default function RegisterForm() {
     }
   }
 
+  const setValueAndClearError = (value: string, setter: React.Dispatch<React.SetStateAction<string | undefined>>) => {
+    setter(value);
+    setError("");
+  }
+
   return (
     <div>
       <h1>Register to Tic Tac Toe</h1>
       <label htmlFor="username">Username: </label>
       <input
         id="username"
-        onChange={(e) => setUsername(e.target.value)}>
+        onChange={(e) => setValueAndClearError(e.target.value, setUsername)}>
       </input><br/>
       <label htmlFor="password">Password: </label>
       <input
         id="password"
         type="password"
-        onChange={(e) => setPassword(e.target.value)}>
+        onChange={(e) => setValueAndClearError(e.target.value, setPassword)}>
       </input><br/>
       <label htmlFor="repeatedPassword">Reenter password: </label>
       <input
         id="repeatedPassword"
         type="password"
-        onChange={(e) => setRepeatedPassword(e.target.value)}>
+        onChange={(e) => setValueAndClearError(e.target.value, setRepeatedPassword)}>
       </input><br/>
       { !!error &&
         <div style={{color: "red"}}>
