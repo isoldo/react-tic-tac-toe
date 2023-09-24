@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { setCookie } from  "typescript-cookie";
 
 export default function LoginForm() {
   const [username, setUsername] = useState<string>();
@@ -37,6 +38,7 @@ export default function LoginForm() {
     if (response.status === 200) {
       const { id, token } = responseBody;
       console.debug({ id, token });
+      setCookie("login", JSON.stringify({ id, token }));
       setLoggedIn(true);
     } else {
       console.error("Error while logging in", {status: response.status, username, password});
