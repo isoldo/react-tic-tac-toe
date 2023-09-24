@@ -10,8 +10,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" Component={Home}></Route>
-        <Route path="/register" Component={RegisterForm}></Route>
+        <Route path="/" Component={Home}/>
+        <Route path="/register" Component={RegisterForm}/>
       </Routes>
     </BrowserRouter>
   );
