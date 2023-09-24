@@ -4,7 +4,7 @@ Frontend for the game of tic tac toe, written in React
 ## Features
 
 - [x] registration
-- [ ] login
+- [x] login
 - [ ] logout
 - [ ] paginated display of existing games
 - [ ] create new game
