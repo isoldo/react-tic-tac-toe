@@ -1,11 +1,28 @@
-import './App.css';
+import { useEffect, useState } from 'react';
 import LoginForm from './components/LoginForm/LoginForm';
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { getCookie } from  "typescript-cookie";
+import { getCookie, removeCookie } from  "typescript-cookie";
 
 function Home() {
-  return(<p>Blank home page</p>);
+  const [logout, setLogout] = useState(false);
+  const [navigateToLogin, setNavigateToLogin] = useState(false);
+
+  useEffect(() => {
+    if (logout) {
+      removeCookie("login");
+      setNavigateToLogin(true);
+    }
+  }, [logout])
+
+  return(
+    <>
+    { navigateToLogin && <Navigate to="/login"/>}
+    <div>
+      <button onClick={() => { setLogout(true) }}>Logout</button>
+    </div>
+    </>
+  );
 }
 
 function ProtectedRoute({ Component, ...rest }: any) {
