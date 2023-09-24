@@ -4,6 +4,7 @@ export default function RegisterForm() {
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [repeatedPassword, setRepeatedPassword] = useState<string>();
+  const [error, setError] = useState<string>();
 
   const isPasswordMatch = (): boolean => {
     return !!password && (password === repeatedPassword);
@@ -28,6 +29,19 @@ export default function RegisterForm() {
 
     const response = await fetch(request);
     console.debug({response});
+    if (response.status !== 200) {
+      console.error("Error while registering user", {status: response.status, username, password});
+      const responseBody = await response.json();
+      console.log({responseBody});
+      if (responseBody.errors) {
+        // non 200 codes are not documented in the Swagger
+        const errors = responseBody.errors as Array<{code: string, message: string, path: string}>;
+        // just take the first error for now
+        setError(`Error: ${errors[0].message}`);
+      } else {
+        setError(`An unknown error occurred (status ${response.status})`);
+      }
+    }
   }
 
   return (
@@ -50,6 +64,11 @@ export default function RegisterForm() {
         type="password"
         onChange={(e) => setRepeatedPassword(e.target.value)}>
       </input><br/>
+      { !!error &&
+        <div style={{color: "red"}}>
+          {error}
+        </div>
+      }
       <button
         disabled={isRegisterButtonDisabled()}
         onClick={registerButtonClicked}>
