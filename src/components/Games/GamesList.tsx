@@ -1,27 +1,9 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import GameTable from "./GamesTable";
+import { Game } from "../../types";
 
 const GAMES_PER_PAGE = 10;
-
-interface BoardRow {
-  row: [number, number, number];
-}
-
-interface User {
-  id: number;
-  username: string;
-}
-
-export interface Game {
-  id: number;
-  board: [BoardRow, BoardRow, BoardRow];
-  winner: User;
-  first_player: User;
-  second_player: User;
-  created: string;
-  status: "finished" | "open" | "progress"
-}
 
 export default function GamesList() {
   const { token } = useUser();

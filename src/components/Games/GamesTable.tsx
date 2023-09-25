@@ -1,5 +1,5 @@
+import { Game } from "../../types";
 import Table from "../Generic/Table";
-import { Game } from "./GamesList";
 import GameTableRow from "./GamesTableRow";
 
 interface GameTableProps {

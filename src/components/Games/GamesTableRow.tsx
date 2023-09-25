@@ -1,5 +1,5 @@
 import { useUser } from "../../hooks/useUser";
-import { Game } from "./GamesList";
+import { Game } from "../../types";
 
 interface GameTableRowProps {
   game: Game;
