@@ -29,6 +29,7 @@ export default function GamesList() {
     console.debug({response});
     const responseBody = await response.json();
     setGames(responseBody.results);
+    // API returns wrong URLs
     const nextUrl = responseBody.next ? (responseBody.next as string).replace("http", "https") : null;
     const prevUrl = responseBody.previous ? (responseBody.previous as string).replace("http", "https") : null;
     setUrl({...url, next: nextUrl, prev: prevUrl});
