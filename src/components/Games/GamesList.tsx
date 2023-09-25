@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
-import React from "react";
+import GameTable from "./GamesTable";
 
 const GAMES_PER_PAGE = 10;
 
@@ -13,7 +13,7 @@ interface User {
   username: string;
 }
 
-interface Game {
+export interface Game {
   id: number;
   board: [BoardRow, BoardRow, BoardRow];
   winner: User;
@@ -23,121 +23,69 @@ interface Game {
   status: "finished" | "open" | "progress"
 }
 
-interface GameTableRowProps {
-  game: Game;
-}
-
-function GameTableRow({game}: GameTableRowProps) {
-  const { id: userId } = useUser();
-  const { id, first_player, second_player, status } = game;
-
-  const currentUser = (userId === first_player.id) || (second_player?.id === userId);
-
-  return (
-    <div>
-      {id} - {status}  - {currentUser ? "true" : "false"}
-    </div>
-  )
-}
-
-interface GameTableProps {
-  games: Game[]
-}
-
-function GameTable({ games }: GameTableProps) {
-  const rowProps = games.map((g) => {return { game: g}});
-  console.debug({rowProps});
-
-  return (
-    <Table items={rowProps} rowComponent={GameTableRow}/>
-  )
-}
-
-interface TableProps<T> {
-  items: Array<T>;
-  rowComponent: React.ComponentType<T>;
-}
-
-function Table<T extends {}>({items, rowComponent}: TableProps<T>): JSX.Element {
-  return (
-    <>
-    {
-      items.map((item, index) => {
-        return (
-          <div key={index}>
-            {React.createElement(rowComponent, item, null)}
-          </div>
-        )
-      })
-    }
-    </>
-  )
-}
-
 export default function GamesList() {
-  const { id, token } = useUser();
+  const { token } = useUser();
   const [url, setUrl] = useState<{ curr: string, next: string | null, prev: string | null}>({
     curr: `https://tictactoe.aboutdream.io/games/?limit=${GAMES_PER_PAGE}`,
     next: null,
     prev: null
   });
-  const [page, setPage] = useState<number>();
-  const [lastRequestedPage, setLastRequestedPage] = useState<number>();
+  const [lastRequestedUrl, setLastRequestedUrl] = useState<string>();
   const [games, setGames] = useState<Game[]>();
 
-  console.debug({page});
-
-  const getGames = async(page: number, token: string) => {
-    const request = new Request(url.curr,
+  const getGames = async(requestUrl: string, token: string) => {
+    const request = new Request(requestUrl,
       {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`
         }
       }
-    );
-    setLastRequestedPage(page);
+      );
     const response = await fetch(request);
+    setLastRequestedUrl(requestUrl);
     console.debug({response});
     const responseBody = await response.json();
     setGames(responseBody.results);
-    setUrl({...url, next: responseBody.next, prev: responseBody.previous});
+    const nextUrl = responseBody.next ? (responseBody.next as string).replace("http", "https") : null;
+    const prevUrl = responseBody.previous ? (responseBody.previous as string).replace("http", "https") : null;
+    setUrl({...url, next: nextUrl, prev: prevUrl});
   }
 
   useEffect(() => {
-    console.debug("useEffect[page, token]");
+    console.debug("useEffect[url, token]");
     if (!token) {
       console.warn("No token, page should not load");
       return;
     }
-    if (page === undefined) {
-      console.debug("Setting page");
-      setPage(0);
+    if (url.curr === undefined) {
+      console.debug("Current URL undefined", {url});
+      return;
     } else {
-      console.debug({page});
-      if (page !== lastRequestedPage) {
-        console.debug({page, lastRequestedPage, token})
-        getGames(page, token);
+      console.debug({url});
+      if (url.curr !== lastRequestedUrl) {
+        console.debug({curr: url.curr, lastRequestedUrl, token})
+        getGames(url.curr, token);
       } else {
         console.debug("Stopped request duplication")
       }
     }
-  }, [page, token]);
+  }, [url, token]);
 
   useEffect(() => {
     console.debug({games});
   }, [games]);
 
   const onPrevButtonClick = () => {
-    if ((page !== undefined) && (page > 0)) {
-      setPage(page-1);
+    if (url.prev) {
+      setUrl({...url, curr: url.prev});
     }
   }
+
   const onNextButtonClick = () => {
-    console.debug("Next button clicked")
-    if (page !== undefined) {
-      console.debug("Should set page to", page+1);
-      setPage(page+1);
+    console.debug("NEXT clicked", {url});
+    if (url.next) {
+      setUrl({...url, curr: url.next});
     }
   }
 
@@ -145,8 +93,8 @@ export default function GamesList() {
     <>
       <div>
         { games && <GameTable games={games}/>}
-        <button disabled={page===0} onClick={onPrevButtonClick}>Prev</button>
-        <button onClick={onNextButtonClick}>Next</button>
+        <button disabled={!url.prev} onClick={onPrevButtonClick}>Prev</button>
+        <button disabled={!url.next} onClick={onNextButtonClick}>Next</button>
       </div>
     </>
   )
