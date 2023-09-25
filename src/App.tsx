@@ -4,6 +4,7 @@ import RegisterForm from './components/RegisterForm/RegisterForm';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { getCookie, removeCookie } from  "typescript-cookie";
 import GamesList from './components/Games/GamesList';
+import UsersList from './components/Users/UsersList';
 
 function Home() {
   const [logout, setLogout] = useState(false);
@@ -44,6 +45,7 @@ function App() {
         <Route path="/login" Component={LoginForm}/>
         <Route path="/" element={<ProtectedRoute Component={Home}/>}/>
         <Route path="/games" element={<ProtectedRoute Component={GamesList}/>}/>
+        <Route path="/users" element={<ProtectedRoute Component={UsersList}/>}/>
       </Routes>
     </BrowserRouter>
   );
