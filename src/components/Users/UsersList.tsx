@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
+import UserTable from "./UserTable";
+import { UserData } from "../../types";
 
 const USERS_PER_PAGE = 10;
-
-interface UserData {
-  id: number;
-  username: string;
-  game_count: number;
-  win_rate: number;
-}
 
 export default function UsersList() {
   const { token } = useUser();
@@ -79,6 +74,7 @@ export default function UsersList() {
 
   return (
     <div>
+      { users && <UserTable users={users}/>}
       <button disabled={!url.prev} onClick={onPrevButtonClick}>Previous</button>
       <button disabled={!url.next} onClick={onNextButtonClick}>Next</button>
     </div>

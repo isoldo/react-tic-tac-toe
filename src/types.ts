@@ -3,6 +3,13 @@ export interface User {
   username: string;
 }
 
+export interface UserData {
+  id: number;
+  username: string;
+  game_count: number;
+  win_rate: number;
+}
+
 export interface BoardRow {
   row: [number, number, number];
 }
