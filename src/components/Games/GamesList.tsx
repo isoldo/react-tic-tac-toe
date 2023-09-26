@@ -90,6 +90,9 @@ export default function GamesList({ get, post }: GameListProps) {
     setCreatingGame(false);
     const responseBody = await response.json();
     console.debug({response, responseBody});
+    // when creating a new game, reset the filter (request the inital URL). Clear last requested URL to hinder double request prevention
+    setLastRequestedUrl(undefined);
+    onFilterSelect("All");
   }
 
   return (
