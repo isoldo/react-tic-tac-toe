@@ -25,12 +25,14 @@ export interface Url {
   }
 }
 
+export type Status = "finished" | "open" | "progress";
+
 export interface Game {
   id: number;
   board: Board;
-  winner: User;
+  winner: User | null;
   first_player: User;
-  second_player: User;
+  second_player: User | null;
   created: string;
-  status: "finished" | "open" | "progress"
+  status: Status;
 }

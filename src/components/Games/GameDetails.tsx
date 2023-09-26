@@ -1,7 +1,8 @@
 import { useLoaderData } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
-import { Board, Game } from "../../types";
+import { Board, Game, Status } from "../../types";
+import "./GameDetails.css";
 
 interface BoardRowLayoutProps {
   row: number[];
@@ -10,8 +11,16 @@ interface BoardRowLayoutProps {
 
 function BoardRowLayout({ row, idMap }: BoardRowLayoutProps) {
   return (
-    <div>
-      {idMap[row[0]] ?? "."} {idMap[row[1]] ?? "."} {idMap[row[2]] ?? "."}
+    <div className="row">
+      {row.map( (field, index) => {
+          return (
+            <div className="column" key={index}>
+              {/* {idMap[field] ?? "."} */}
+              <input placeholder={idMap[field ?? "."]} disabled={!!field}></input>
+            </div>
+          )
+        })
+      }
     </div>
   )
 }
@@ -19,16 +28,16 @@ function BoardRowLayout({ row, idMap }: BoardRowLayoutProps) {
 interface  BoardLayoutProps {
   players: {
     firstPlayer: number;
-    secondPlayer: number;
+    secondPlayer: number | undefined;
   }
   board: Board;
-  marks: {
+  marks?: {
     firstPlayer: string;
     secondPlayer: string;
   }
 }
 
-function BoardLayout({ players, marks, board }: BoardLayoutProps) {
+function BoardLayout({ players, marks = {firstPlayer: "X", secondPlayer: "O"}, board }: BoardLayoutProps) {
 
   board.map((br) => console.debug({br}));
 
@@ -36,24 +45,35 @@ function BoardLayout({ players, marks, board }: BoardLayoutProps) {
   const secondPlayer = players.secondPlayer;
   const idMap = {
     [firstPlayer]: marks.firstPlayer,
-    [secondPlayer]: marks.secondPlayer
+    [secondPlayer ?? -1]: marks.secondPlayer
   }
 
-  console.debug({idMap})
+  console.debug({idMap});
 
   return (
-    <>
-    {
-      board.map(row => {
-        return (
-          <>
-            <BoardRowLayout row={row} idMap={idMap}/>
-          </>
-        );
-      })
-    }
-    </>
+    <div>
+      <p>The board:</p>
+      {
+        board.map((row, index) => {
+          return (
+              <div key={index}>
+                <BoardRowLayout row={row} idMap={idMap}/>
+              </div>
+          );
+        })
+      }
+    </div>
   )
+}
+
+function getGameStatusText(status: Status) {
+  const statusTexts: Record<Status, string> = {
+    "finished": "Finished",
+    "open": "Open",
+    "progress": "In progress"
+  }
+
+  return statusTexts[status];
 }
 
 export default function GameDetails() {
@@ -90,16 +110,21 @@ export default function GameDetails() {
   return (
     <div>
       <p>ID: {id}</p>
-      { currentGame &&
-        <p>Created at ${currentGame.created}</p>
-      }
-      { currentGame?.board &&
-        <div>
-          <BoardLayout
-            board={currentGame.board}
-            players={{firstPlayer: currentGame.first_player.id, secondPlayer: currentGame.second_player.id}}
-            marks={{firstPlayer: "X", secondPlayer: "O"}} />
-        </div>
+      {
+        currentGame &&
+        <>
+          <p>Created at {(new Date(currentGame.created)).toLocaleString()}</p>
+          <p>Status: {getGameStatusText(currentGame.status)}</p>
+          <p>First player: {currentGame.first_player.username}</p>
+          <p>Second player: {currentGame.second_player?.username ?? "Waiting for player"}</p>
+          { currentGame.board &&
+            <div>
+              <BoardLayout
+                board={currentGame.board}
+                players={{firstPlayer: currentGame.first_player.id, secondPlayer: currentGame.second_player?.id}} />
+            </div>
+          }
+        </>
       }
     </div>
   )
