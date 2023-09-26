@@ -36,3 +36,9 @@ export interface Game {
   created: string;
   status: Status;
 }
+
+export interface ApiError {
+  code: string;
+  message: string;
+  path: string;
+}
