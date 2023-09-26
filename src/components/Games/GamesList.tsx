@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import GameTable from "./GamesTable";
-import { Game } from "../../types";
+import { Filter, FilterValues, Game, Url } from "../../types";
+import { gameStatusMapper } from "../../utils/gameStatusMapper";
 
 const GAMES_PER_PAGE = 10;
 
 export default function GamesList() {
   const { token } = useUser();
-  const [url, setUrl] = useState<{ curr: string, next: string | null, prev: string | null}>({
+  const [url, setUrl] = useState<Url>({
     curr: `https://tictactoe.aboutdream.io/games/?limit=${GAMES_PER_PAGE}`,
     next: null,
     prev: null
@@ -46,9 +47,9 @@ export default function GamesList() {
       return;
     } else {
       console.debug({url});
-      if (url.curr !== lastRequestedUrl) {
+      if (`${url.curr}${url.options ?? ""}` !== lastRequestedUrl) {
         console.debug({curr: url.curr, lastRequestedUrl, token})
-        getGames(url.curr, token);
+        getGames(`${url.curr}${url.options ?? ""}`, token);
       } else {
         console.debug("Stopped request duplication")
       }
@@ -72,9 +73,24 @@ export default function GamesList() {
     }
   }
 
+  const onFilterSelect = (value: Filter) => {
+    if (value === "All") {
+      setUrl({...url, options: null})
+    } else {
+      setUrl({...url, options: `&status=${gameStatusMapper[value]}`});
+    }
+  }
+
   return (
     <>
       <div>
+        <select name="status" id="game-status" onChange={(e) => onFilterSelect(e.target.value as Filter)}>
+          {FilterValues.map(filterValue => {
+            return(
+              <option value={filterValue}>{filterValue}</option>
+            )
+          })}
+        </select>
         { games && <GameTable games={games}/>}
         <button disabled={!url.prev} onClick={onPrevButtonClick}>Prev</button>
         <button disabled={!url.next} onClick={onNextButtonClick}>Next</button>
