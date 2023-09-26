@@ -3,73 +3,7 @@ import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
 import { ApiError, Board, Game, Status } from "../../types";
 import "./GameDetails.css";
-
-interface BoardRowLayoutProps {
-  rowIndex: number;
-  row: number[];
-  idMap: Record<number, string>;
-  canMakeMove: boolean;
-  onMoveClick: (rowIndex: number, columnIndex: number) => void;
-}
-
-function BoardRowLayout({ row, idMap, canMakeMove, rowIndex, onMoveClick }: BoardRowLayoutProps) {
-  return (
-    <div className="row">
-      {row.map( (field, index) => {
-        console.log({field, rowIndex, index});
-          return (
-            <div className="column" key={index} onClick={() => onMoveClick(rowIndex, index)}>
-              <input placeholder={idMap[field] ?? `. (${index})`} disabled={!canMakeMove || !!field}></input>
-            </div>
-          )
-        })
-      }
-    </div>
-  )
-}
-
-interface  BoardLayoutProps {
-  canMakeMove: boolean;
-  players: {
-    firstPlayer: number;
-    secondPlayer: number | undefined;
-  }
-  board: Board;
-  marks?: {
-    firstPlayer: string;
-    secondPlayer: string;
-  };
-  onMoveClick: (rowIndex: number, columnIndex: number) => void;
-}
-
-function BoardLayout({ players, marks = {firstPlayer: "X", secondPlayer: "O"}, board, canMakeMove, onMoveClick }: BoardLayoutProps) {
-
-  board.map((br) => console.debug({br}));
-
-  const firstPlayer = players.firstPlayer;
-  const secondPlayer = players.secondPlayer;
-  const idMap = {
-    [firstPlayer]: marks.firstPlayer,
-    [secondPlayer ?? -1]: marks.secondPlayer
-  }
-
-  console.debug({idMap});
-
-  return (
-    <div>
-      <p>The board:</p>
-      {
-        board.map((row, index) => {
-          return (
-              <div key={index}>
-                <BoardRowLayout rowIndex={index} row={row} idMap={idMap} canMakeMove={canMakeMove} onMoveClick={onMoveClick}/>
-              </div>
-          );
-        })
-      }
-    </div>
-  )
-}
+import BoardLayout from "../Board/BoardLayout";
 
 function getGameStatusText(status: Status) {
   const statusTexts: Record<Status, string> = {
