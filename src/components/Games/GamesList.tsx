@@ -76,24 +76,17 @@ export default function GamesList() {
   }
 
   const onFilterSelect = (value: Filter) => {
+    let clearedOptions = url.options.curr;
+    const indexOfStatus = url.options.curr?.indexOf("&status=");
+    if (indexOfStatus !== -1) {
+      const substring = url.options.curr?.slice(indexOfStatus);
+      const clearedSubstring = substring?.split("&")[2];
+      clearedOptions = `${url.options.curr?.slice(0,indexOfStatus)}${clearedSubstring ?? ""}`;
+      console.debug({indexOfStatus, substring, clearedSubstring, clearedOptions})
+    }
     if (value === "All") {
-      // remove status from options
-      if (url.options.curr?.includes("status")) {
-        const indexOfStatus = url.options.curr.indexOf("&status=");
-        const substring = url.options.curr.slice(indexOfStatus);
-        const clearedSubstring = substring.split("&")[2];
-        const newOptions = `${url.options.curr.slice(0,indexOfStatus)}${clearedSubstring ?? ""}`;
-        console.log({indexOfStatus, substring, clearedSubstring, newOptions})
-        setUrl({...url, options: {...url.options, curr: newOptions}});
-      }
+      setUrl({...url, options: {...url.options, curr: clearedOptions}});
     } else {
-      let clearedOptions = url.options.curr;
-      if (url.options.curr?.includes("status")) {
-        const indexOfStatus = url.options.curr.indexOf("&status=");
-        const substring = url.options.curr.slice(indexOfStatus);
-        const clearedSubstring = substring.split("&")[2];
-        clearedOptions = `${url.options.curr.slice(0,indexOfStatus)}${clearedSubstring ?? ""}`;
-      }
       setUrl({...url, options: { ...url.options, curr: `${clearedOptions ?? ""}&status=${gameStatusMapper[value]}`}})
     }
   }
