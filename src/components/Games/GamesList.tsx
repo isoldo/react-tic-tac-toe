@@ -18,6 +18,7 @@ export default function GamesList() {
   });
   const [lastRequestedUrl, setLastRequestedUrl] = useState<string>();
   const [games, setGames] = useState<Game[]>();
+  const [creatingGame, setCreatingGame] = useState(false);
 
   const getGames = async(requestUrl: string, token: string) => {
     const request = new Request(requestUrl,
@@ -27,7 +28,7 @@ export default function GamesList() {
           "Authorization": `Bearer ${token}`
         }
       }
-      );
+    );
     const response = await fetch(request);
     setLastRequestedUrl(requestUrl);
     console.debug({response});
@@ -91,9 +92,28 @@ export default function GamesList() {
     }
   }
 
+  const onNewGameClick = async () => {
+    const request = new Request("https://tictactoe.aboutdream.io/games/",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+    setCreatingGame(true);
+    const response = await fetch(request);
+    setCreatingGame(false);
+    const responseBody = await response.json();
+    console.debug({response, responseBody});
+  }
+
   return (
     <>
       <div>
+        <div>
+          <button disabled={creatingGame} onClick={onNewGameClick}>{creatingGame ? "Creating..." : "New game"}</button>
+        </div>
         <select name="status" id="game-status" onChange={(e) => onFilterSelect(e.target.value as Filter)}>
           {FilterValues.map((filterValue, index) => {
             return(
