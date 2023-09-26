@@ -1,11 +1,15 @@
 import { getCookie } from  "typescript-cookie";
+import { UserToken } from "../types";
 
-export function useUser() {
+export function useUser(): UserToken {
   const cookie = getCookie("login");
   if (cookie) {
-    const { id, token } = JSON.parse(cookie);
-    console.debug({id, token});
-    return { id, token };
+    try {
+      const { id, token } = JSON.parse(cookie);
+      return { id, token };
+    } catch (e) {
+      console.error({error: e});
+    }
   }
 
   return { id: null, token: null };

@@ -10,6 +10,11 @@ export interface UserData {
   win_rate: number;
 }
 
+export interface UserToken {
+  id: number | null;
+  token: string | null;
+}
+
 export type BoardRow = number[];
 export type Board = [BoardRow, BoardRow, BoardRow];
 
