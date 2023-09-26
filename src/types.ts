@@ -18,10 +18,12 @@ export const FilterValues = ["All", "Open", "In progress", "Finished"] as const;
 export type Filter = typeof FilterValues[number];
 
 export interface Url {
-  curr: string;
-  prev: string | null;
-  next: string | null;
-  options?: string | null;
+  base: string;
+  options: {
+    curr: string | null;
+    prev: string | null;
+    next: string | null;
+  }
 }
 
 export interface Game {

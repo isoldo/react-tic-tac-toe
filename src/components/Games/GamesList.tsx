@@ -1,19 +1,10 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import GameTable from "./GamesTable";
-import { Filter, FilterValues, Game } from "../../types";
+import { Filter, FilterValues, Game, Url } from "../../types";
 import { gameStatusMapper } from "../../utils/gameStatusMapper";
 
 const GAMES_PER_PAGE = 10;
-
-interface Url {
-  base: string;
-  options: {
-    curr: string | null;
-    prev: string | null;
-    next: string | null;
-  }
-}
 
 export default function GamesList() {
   const { token } = useUser();

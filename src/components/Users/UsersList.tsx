@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import UserTable from "./UserTable";
-import { UserData } from "../../types";
+import { Url, UserData } from "../../types";
 
 const USERS_PER_PAGE = 10;
 
 export default function UsersList() {
   const { token } = useUser();
-  const [url, setUrl] = useState<{ curr: string, next: string | null, prev: string | null}>({
-    curr: `https://tictactoe.aboutdream.io/users/?limit=${USERS_PER_PAGE}`,
-    next: null,
-    prev: null
+  const [url, setUrl] = useState<Url>({
+    base: `https://tictactoe.aboutdream.io/users/`,
+    options: {
+      curr: `limit=${USERS_PER_PAGE}`,
+      prev: null,
+      next: null
+    }
   });
   const [lastRequestedUrl, setLastRequestedUrl] = useState<string>();
   const [users, setUsers] = useState<UserData[]>();
@@ -29,10 +32,9 @@ export default function UsersList() {
     console.debug({response});
     const responseBody = await response.json();
     setUsers(responseBody.results);
-    // API returns wrong URLs
-    const nextUrl = responseBody.next ? (responseBody.next as string).replace("http", "https") : null;
-    const prevUrl = responseBody.previous ? (responseBody.previous as string).replace("http", "https") : null;
-    setUrl({...url, next: nextUrl, prev: prevUrl});
+    const nextOptions = responseBody.next ? `?${(responseBody.next as string).split("?")[1]}` : null;
+    const prevOptions = responseBody.previous ? `?${(responseBody.previous as string).split("?")[1]}` : null;
+    setUrl({...url, options: { ...url.options, next: nextOptions, prev: prevOptions}});
   }
 
   useEffect(() => {
@@ -41,14 +43,15 @@ export default function UsersList() {
       console.warn("No token, page should not load");
       return;
     }
-    if (url.curr === undefined) {
+    if (url.base === undefined) {
       console.debug("Current URL undefined", {url});
       return;
     } else {
       console.debug({url});
-      if (url.curr !== lastRequestedUrl) {
-        console.debug({curr: url.curr, lastRequestedUrl, token})
-        getUsers(url.curr, token);
+      const formedUrl = `${url.base}${url.options.curr ? `?${url.options.curr}`: ""}`
+      if (formedUrl !== lastRequestedUrl) {
+        console.debug({formedUrl, lastRequestedUrl, token})
+        getUsers(formedUrl, token);
       } else {
         console.debug("Stopped request duplication")
       }
@@ -60,23 +63,22 @@ export default function UsersList() {
   }, [users]);
 
   const onPrevButtonClick = () => {
-    if (url.prev) {
-      setUrl({...url, curr: url.prev});
+    if (url.options.prev) {
+      setUrl({...url, options: { ...url.options, curr: url.options.prev}});
     }
   }
 
   const onNextButtonClick = () => {
-    console.debug("NEXT clicked", {url});
-    if (url.next) {
-      setUrl({...url, curr: url.next});
+    if (url.options.next) {
+      setUrl({...url, options: { ...url.options, curr: url.options.next}});
     }
   }
 
   return (
     <div>
       { users && <UserTable users={users}/>}
-      <button disabled={!url.prev} onClick={onPrevButtonClick}>Previous</button>
-      <button disabled={!url.next} onClick={onNextButtonClick}>Next</button>
+      <button disabled={!url.options.prev} onClick={onPrevButtonClick}>Previous</button>
+      <button disabled={!url.options.next} onClick={onNextButtonClick}>Next</button>
     </div>
   )
 }
