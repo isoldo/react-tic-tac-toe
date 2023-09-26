@@ -10,9 +10,8 @@ export interface UserData {
   win_rate: number;
 }
 
-export interface BoardRow {
-  row: [number, number, number];
-}
+export type BoardRow = number[];
+export type Board = [BoardRow, BoardRow, BoardRow];
 
 export const FilterValues = ["All", "Open", "In progress", "Finished"] as const;
 export type Filter = typeof FilterValues[number];
@@ -28,7 +27,7 @@ export interface Url {
 
 export interface Game {
   id: number;
-  board: [BoardRow, BoardRow, BoardRow];
+  board: Board;
   winner: User;
   first_player: User;
   second_player: User;
