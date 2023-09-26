@@ -14,6 +14,16 @@ export interface BoardRow {
   row: [number, number, number];
 }
 
+export const FilterValues = ["All", "Open", "In progress", "Finished"] as const;
+export type Filter = typeof FilterValues[number];
+
+export interface Url {
+  curr: string;
+  prev: string | null;
+  next: string | null;
+  options?: string | null;
+}
+
 export interface Game {
   id: number;
   board: [BoardRow, BoardRow, BoardRow];
