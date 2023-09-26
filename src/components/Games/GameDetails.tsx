@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
-import { ApiError, Board, Game, Status } from "../../types";
+import { ApiError, Game, Status } from "../../types";
 import "./GameDetails.css";
 import BoardLayout from "../Board/BoardLayout";
 
@@ -15,25 +15,22 @@ function getGameStatusText(status: Status) {
   return statusTexts[status];
 }
 
-export default function GameDetails() {
+interface GameDetailsProps {
+  get: (url: string) => Promise<Response>;
+  post: (url: string, body: Record<string, unknown>) => Promise<Response>;
+}
+
+export default function GameDetails({ get, post }: GameDetailsProps) {
   const { id } = useLoaderData() as { id: number };
-  const { id: userId, token } = useUser();
+  const { id: userId } = useUser();
   const [currentGame, setCurrentGame] = useState<Game>();
   const [isUserParticipating, setIsUserParticipating] = useState(false);
   const [error, setError] = useState<string | null>();
 
   console.debug({ id });
 
-  const getGame = async(id: number, token: string) => {
-    const request = new Request(`https://tictactoe.aboutdream.io/games/${id}`,
-      {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
-    const response = await fetch(request);
+  const getGame = async(id: number) => {
+    const response = await get(`https://tictactoe.aboutdream.io/games/${id}`);
     console.debug({response});
     const responseBody = await response.json();
     console.debug({responseBody});
@@ -52,24 +49,14 @@ export default function GameDetails() {
   }, [userId, currentGame]);
 
   useEffect(() => {
-    if (token && !!id) {
-      getGame(id, token)
+    if (!!id) {
+      getGame(id)
     }
-  }, [id, token]);
+  }, [id]);
 
   const onMoveClick = async (rowIndex: number, columnIndex: number) => {
     if (!currentGame) return;
-    const request = new Request(`https://tictactoe.aboutdream.io/games/${id}/move/`,
-      {
-        method: "POST",
-        body: JSON.stringify({row: rowIndex, col: columnIndex}),
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type":"application/json"
-        }
-      }
-    );
-    const response = await fetch(request);
+    const response = await post(`https://tictactoe.aboutdream.io/games/${id}/move/`, {row: rowIndex, col: columnIndex});
     console.debug({response});
     try {
       const responseBody = await response.json();
@@ -88,17 +75,8 @@ export default function GameDetails() {
 
   const onJoinClick = async () => {
     if (canUserJoin) {
-      const request = new Request(`https://tictactoe.aboutdream.io/games/${id}/join/`,
-        {
-          method: "POST",
-          body: JSON.stringify({winner: "", first_player: currentGame.first_player.id, second_player: userId}),
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type":"application/json"
-          }
-        }
-      );
-      const response = await fetch(request);
+      const requestBody = {winner: "", first_player: currentGame.first_player.id};
+      const response = await post(`https://tictactoe.aboutdream.io/games/${id}/join/`, requestBody);
       console.debug({response});
       try {
         const responseBody = await response.json();
