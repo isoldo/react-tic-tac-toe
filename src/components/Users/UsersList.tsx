@@ -24,7 +24,6 @@ export default function UsersList({ get }: UserListProps) {
   const getUsers = async (requestUrl: string) => {
     const response = await get(requestUrl);
     setLastRequestedUrl(requestUrl);
-    console.debug({response});
     const responseBody = await response.json();
     setUsers(responseBody.results);
     const nextOptions = responseBody.next ? `?${(responseBody.next as string).split("?")[1]}` : null;
@@ -33,25 +32,15 @@ export default function UsersList({ get }: UserListProps) {
   }
 
   useEffect(() => {
-    console.debug("useEffect[url]");
     if (url.base === undefined) {
-      console.debug("Current URL undefined", {url});
       return;
     } else {
-      console.debug({url});
       const formedUrl = `${url.base}${url.options.curr ? `?${url.options.curr}`: ""}`
       if (formedUrl !== lastRequestedUrl) {
-        console.debug({formedUrl, lastRequestedUrl})
         getUsers(formedUrl);
-      } else {
-        console.debug("Stopped request duplication")
       }
     }
   }, [url]);
-
-  useEffect(() => {
-    console.debug({users});
-  }, [users]);
 
   const onPrevButtonClick = () => {
     if (url.options.prev) {

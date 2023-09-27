@@ -10,7 +10,6 @@ interface GameTableProps {
 
 export default function GameTable({ games, setGameId, userId }: GameTableProps) {
   const rowProps = games.map((g) => {return { game: g, setGameId, userId}});
-  console.debug({rowProps});
 
   return (
     <Table items={rowProps} rowComponent={GameTableRow}/>

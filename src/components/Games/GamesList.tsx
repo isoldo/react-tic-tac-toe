@@ -28,7 +28,6 @@ export default function GamesList({ get, post, setGameId, userId }: GameListProp
   const getGames = async(requestUrl: string) => {
     const response = await get(requestUrl);
     setLastRequestedUrl(requestUrl);
-    console.debug({response});
     const responseBody = await response.json();
     setGames(responseBody.results);
     const nextOptions = responseBody.next ? `?${(responseBody.next as string).split("?")[1]}` : null;
@@ -37,25 +36,15 @@ export default function GamesList({ get, post, setGameId, userId }: GameListProp
   }
 
   useEffect(() => {
-    console.debug("useEffect[url]");
     if (url.base === undefined) {
-      console.debug("Current URL undefined", {url});
       return;
     } else {
-      console.debug({url});
       const formedUrl = `${url.base}${url.options.curr ? `?${url.options.curr}`: ""}`
       if (formedUrl !== lastRequestedUrl) {
-        console.debug({formedUrl, lastRequestedUrl})
         getGames(formedUrl);
-      } else {
-        console.debug("Stopped request duplication")
       }
     }
   }, [url]);
-
-  useEffect(() => {
-    console.debug({games});
-  }, [games]);
 
   const onPrevButtonClick = () => {
     if (url.options.prev) {
@@ -76,7 +65,6 @@ export default function GamesList({ get, post, setGameId, userId }: GameListProp
       const substring = url.options.curr?.slice(indexOfStatus);
       const clearedSubstring = substring?.split("&")[2];
       clearedOptions = `${url.options.curr?.slice(0,indexOfStatus)}${clearedSubstring ?? ""}`;
-      console.debug({indexOfStatus, substring, clearedSubstring, clearedOptions})
     }
     if (value === "All") {
       setUrl({...url, options: {...url.options, curr: clearedOptions}});
@@ -89,8 +77,7 @@ export default function GamesList({ get, post, setGameId, userId }: GameListProp
     setCreatingGame(true);
     const response = await post("https://tictactoe.aboutdream.io/games/", {});
     setCreatingGame(false);
-    const responseBody = await response.json();
-    console.debug({response, responseBody});
+    const _responseBody = await response.json();
     // when creating a new game, reset the filter (request the inital URL). Clear last requested URL to hinder double request prevention
     setLastRequestedUrl(undefined);
     onFilterSelect("All");

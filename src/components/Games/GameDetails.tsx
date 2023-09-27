@@ -30,15 +30,10 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
   const [moving, setMoving] = useState(false);
   const [intervalId, setIntervalId] = useState<NodeJS.Timer>();
 
-  console.debug({ gameId });
-
   const getGame = async(id: number) => {
     const response = await get(`https://tictactoe.aboutdream.io/games/${id}`);
-    console.debug({response});
     const responseBody = await response.json();
-    console.debug({responseBody});
     const game: Game = responseBody;
-    console.debug({game});
     setCurrentGame(game);
   }
 
@@ -50,7 +45,6 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
       }
       if (userId) {
         if ([currentGame.first_player.id, currentGame.second_player?.id].includes(userId)) {
-          console.debug({userId})
           setIsUserParticipating(true);
         }
       }
@@ -68,10 +62,8 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
     if (!currentGame) return;
     setMoving(true);
     const response = await post(`https://tictactoe.aboutdream.io/games/${gameId}/move/`, {row: rowIndex, col: columnIndex});
-    console.debug({response});
     try {
       const responseBody = await response.json();
-      console.debug({responseBody});
       if (responseBody.errors.length) {
         const errors: ApiError[] = responseBody.errors;
         setError(errors[0].message);
@@ -93,10 +85,8 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
       const requestBody = {winner: "", first_player: currentGame.first_player.id};
       setJoining(true);
       const response = await post(`https://tictactoe.aboutdream.io/games/${gameId}/join/`, requestBody);
-      console.debug({response});
       try {
         const responseBody = await response.json();
-        console.debug({responseBody});
       } catch (e) {
         console.error({e});
       }

@@ -19,7 +19,6 @@ export default function LoginForm() {
   }
 
   const loginButtonClicked = async () => {
-    console.debug({ username, password });
     const requestBody = { username, password };
     const request = new Request("https://tictactoe.aboutdream.io/login/",
       {
@@ -34,10 +33,8 @@ export default function LoginForm() {
     setLoggingIn(true);
     const response = await fetch(request);
     const responseBody = await response.json()
-    console.debug({response, responseBody});
     if (response.status === 200) {
       const { id, token } = responseBody;
-      console.debug({ id, token });
       setCookie("login", JSON.stringify({ id, token }));
       setLoggedIn(true);
     } else {
