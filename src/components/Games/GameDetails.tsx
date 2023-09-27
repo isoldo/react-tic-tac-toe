@@ -28,6 +28,7 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
   const [reload, setReload] = useState(true);
   const [joining, setJoining] = useState(false);
   const [moving, setMoving] = useState(false);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timer>();
 
   console.debug({ gameId });
 
@@ -42,10 +43,16 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
   }
 
   useEffect(() => {
-    if (userId && currentGame) {
-      if ([currentGame.first_player.id, currentGame.second_player?.id].includes(userId)) {
-        console.debug({userId})
-        setIsUserParticipating(true);
+    if (currentGame) {
+      if (currentGame.status !== "finished" && !intervalId) {
+        const iid = setInterval(() => setReload(true), 2000);
+        setIntervalId(iid);
+      }
+      if (userId) {
+        if ([currentGame.first_player.id, currentGame.second_player?.id].includes(userId)) {
+          console.debug({userId})
+          setIsUserParticipating(true);
+        }
       }
     }
   }, [userId, currentGame]);
@@ -107,8 +114,8 @@ export default function GameDetails({ get, post, gameId, userId, setGameId}: Gam
           {
             canUserJoin && <button onClick={onJoinClick} disabled={joining}>{joining ? "Joining" : "Join game"}</button>
           }
-          <button onClick={() => setGameId(null)}>Back</button>
-          <button onClick={() => {setReload(true); setError(null)}} disabled={reload}>{reload ? "Fetching game status" : "Refresh board state"}</button>
+          <button onClick={() => {setGameId(null); clearInterval(intervalId);}}>Back</button>
+          <button onClick={() => {setReload(true); setError(null);}} disabled={reload}>{reload ? "Fetching game status" : "Refresh board state"}</button>
           <p>Created at {(new Date(currentGame.created)).toLocaleString()}</p>
           <p>Status: {getGameStatusText(currentGame.status)}</p>
           <p>First player: {currentGame.first_player.username}</p>
