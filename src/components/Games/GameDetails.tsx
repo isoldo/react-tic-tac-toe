@@ -27,6 +27,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
   const [isUserParticipating, setIsUserParticipating] = useState(false);
   const [error, setError] = useState<string | null>();
   const [reload, setReload] = useState(true);
+  const [joining, setJoining] = useState(false);
 
   console.debug({ gameId });
 
@@ -79,6 +80,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
   const onJoinClick = async () => {
     if (canUserJoin) {
       const requestBody = {winner: "", first_player: currentGame.first_player.id};
+      setJoining(true);
       const response = await post(`https://tictactoe.aboutdream.io/games/${gameId}/join/`, requestBody);
       console.debug({response});
       try {
@@ -88,6 +90,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
         console.error({e});
       }
       setReload(true);
+      setJoining(false);
     }
   }
 
@@ -98,7 +101,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
         currentGame &&
         <>
           {
-            canUserJoin && <button onClick={onJoinClick}>Join game</button>
+            canUserJoin && <button onClick={onJoinClick} disabled={joining}>{joining ? "Joining" : "Join game"}</button>
           }
           <button onClick={() => setGameId(null)}>Back</button>
           <p>Created at {(new Date(currentGame.created)).toLocaleString()}</p>
