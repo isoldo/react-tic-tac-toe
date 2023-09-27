@@ -109,7 +109,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
             canUserJoin && <button onClick={onJoinClick} disabled={joining}>{joining ? "Joining" : "Join game"}</button>
           }
           <button onClick={() => setGameId(null)}>Back</button>
-          <button onClick={() => {setReload(true); setError(null)}}>Refresh board state</button>
+          <button onClick={() => {setReload(true); setError(null)}} disabled={reload}>{reload ? "Fetching game status" : "Refresh board state"}</button>
           <p>Created at {(new Date(currentGame.created)).toLocaleString()}</p>
           <p>Status: {getGameStatusText(currentGame.status)}</p>
           <p>First player: {currentGame.first_player.username}</p>
