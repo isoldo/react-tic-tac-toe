@@ -26,6 +26,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
   const [currentGame, setCurrentGame] = useState<Game>();
   const [isUserParticipating, setIsUserParticipating] = useState(false);
   const [error, setError] = useState<string | null>();
+  const [reload, setReload] = useState(true);
 
   console.debug({ gameId });
 
@@ -49,10 +50,11 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
   }, [userId, currentGame]);
 
   useEffect(() => {
-    if (!!gameId) {
-      getGame(gameId)
+    if (!!gameId && reload) {
+      getGame(gameId);
+      setReload(false);
     }
-  }, [gameId]);
+  }, [gameId, reload]);
 
   const onMoveClick = async (rowIndex: number, columnIndex: number) => {
     if (!currentGame) return;
@@ -68,6 +70,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
     } catch (e) {
       console.error({e});
     }
+    setReload(true);
   }
 
   // some of these conditions are redundant
@@ -84,6 +87,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
       } catch (e) {
         console.error({e});
       }
+      setReload(true);
     }
   }
 
