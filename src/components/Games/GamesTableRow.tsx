@@ -15,7 +15,7 @@ export default function GameTableRow({game, setGameId}: GameTableRowProps) {
   const onGameClick = () => setGameId(id);
   return (
     <div onClick={onGameClick}>
-      {id} - {status}  - {currentUser ? "true" : "false"}
+      {id} - {status}  - {currentUser ? "You are participating" : "You are not participating"}
     </div>
   )
 }
