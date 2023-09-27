@@ -10,9 +10,13 @@ export interface UserData {
   win_rate: number;
 }
 
-export interface BoardRow {
-  row: [number, number, number];
+export interface UserToken {
+  id: number | null;
+  token: string | null;
 }
+
+export type BoardRow = number[];
+export type Board = [BoardRow, BoardRow, BoardRow];
 
 export const FilterValues = ["All", "Open", "In progress", "Finished"] as const;
 export type Filter = typeof FilterValues[number];
@@ -26,12 +30,20 @@ export interface Url {
   }
 }
 
+export type Status = "finished" | "open" | "progress";
+
 export interface Game {
   id: number;
-  board: [BoardRow, BoardRow, BoardRow];
-  winner: User;
+  board: Board;
+  winner: User | null;
   first_player: User;
-  second_player: User;
+  second_player: User | null;
   created: string;
-  status: "finished" | "open" | "progress"
+  status: Status;
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  path: string;
 }

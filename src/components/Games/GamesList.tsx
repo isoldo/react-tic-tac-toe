@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
-import { useUser } from "../../hooks/useUser";
 import GameTable from "./GamesTable";
 import { Filter, FilterValues, Game, Url } from "../../types";
 import { gameStatusMapper } from "../../utils/gameStatusMapper";
 
 const GAMES_PER_PAGE = 10;
 
-export default function GamesList() {
-  const { token } = useUser();
+interface GameListProps {
+  userId: number | null;
+  get: (url: string) => Promise<Response>;
+  post: (url: string, body: Record<string, unknown>) => Promise<Response>;
+  setGameId: (id: number | null) => void;
+}
+
+export default function GamesList({ get, post, setGameId, userId }: GameListProps) {
   const [url, setUrl] = useState<Url>({
     base: `https://tictactoe.aboutdream.io/games/`,
     options: {
@@ -20,16 +25,8 @@ export default function GamesList() {
   const [games, setGames] = useState<Game[]>();
   const [creatingGame, setCreatingGame] = useState(false);
 
-  const getGames = async(requestUrl: string, token: string) => {
-    const request = new Request(requestUrl,
-      {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
-    const response = await fetch(request);
+  const getGames = async(requestUrl: string) => {
+    const response = await get(requestUrl);
     setLastRequestedUrl(requestUrl);
     console.debug({response});
     const responseBody = await response.json();
@@ -40,11 +37,7 @@ export default function GamesList() {
   }
 
   useEffect(() => {
-    console.debug("useEffect[url, token]");
-    if (!token) {
-      console.warn("No token, page should not load");
-      return;
-    }
+    console.debug("useEffect[url]");
     if (url.base === undefined) {
       console.debug("Current URL undefined", {url});
       return;
@@ -52,13 +45,13 @@ export default function GamesList() {
       console.debug({url});
       const formedUrl = `${url.base}${url.options.curr ? `?${url.options.curr}`: ""}`
       if (formedUrl !== lastRequestedUrl) {
-        console.debug({formedUrl, lastRequestedUrl, token})
-        getGames(formedUrl, token);
+        console.debug({formedUrl, lastRequestedUrl})
+        getGames(formedUrl);
       } else {
         console.debug("Stopped request duplication")
       }
     }
-  }, [url, token]);
+  }, [url]);
 
   useEffect(() => {
     console.debug({games});
@@ -93,19 +86,14 @@ export default function GamesList() {
   }
 
   const onNewGameClick = async () => {
-    const request = new Request("https://tictactoe.aboutdream.io/games/",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
     setCreatingGame(true);
-    const response = await fetch(request);
+    const response = await post("https://tictactoe.aboutdream.io/games/", {});
     setCreatingGame(false);
     const responseBody = await response.json();
     console.debug({response, responseBody});
+    // when creating a new game, reset the filter (request the inital URL). Clear last requested URL to hinder double request prevention
+    setLastRequestedUrl(undefined);
+    onFilterSelect("All");
   }
 
   return (
@@ -121,7 +109,7 @@ export default function GamesList() {
             )
           })}
         </select>
-        { games && <GameTable games={games}/>}
+        { games && <GameTable games={games} setGameId={setGameId} userId={userId}/>}
         <button disabled={!url.options.prev} onClick={onPrevButtonClick}>Prev</button>
         <button disabled={!url.options.next} onClick={onNextButtonClick}>Next</button>
       </div>

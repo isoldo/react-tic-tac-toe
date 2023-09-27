@@ -3,11 +3,13 @@ import Table from "../Generic/Table";
 import GameTableRow from "./GamesTableRow";
 
 interface GameTableProps {
-  games: Game[]
+  games: Game[];
+  setGameId: (id: number) => void;
+  userId: number | null;
 }
 
-export default function GameTable({ games }: GameTableProps) {
-  const rowProps = games.map((g) => {return { game: g}});
+export default function GameTable({ games, setGameId, userId }: GameTableProps) {
+  const rowProps = games.map((g) => {return { game: g, setGameId, userId}});
   console.debug({rowProps});
 
   return (

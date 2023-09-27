@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { useUser } from "../../hooks/useUser";
 import UserTable from "./UserTable";
 import { Url, UserData } from "../../types";
 
 const USERS_PER_PAGE = 10;
 
-export default function UsersList() {
-  const { token } = useUser();
+interface UserListProps {
+  get: (url: string) => Promise<Response>;
+  post: (url: string, body: Record<string, unknown>) => Promise<Response>;
+}
+
+export default function UsersList({ get }: UserListProps) {
   const [url, setUrl] = useState<Url>({
     base: `https://tictactoe.aboutdream.io/users/`,
     options: {
@@ -18,16 +21,8 @@ export default function UsersList() {
   const [lastRequestedUrl, setLastRequestedUrl] = useState<string>();
   const [users, setUsers] = useState<UserData[]>();
 
-  const getUsers = async (requestUrl: string, token: string) => {
-    const request = new Request(requestUrl,
-      {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }
-      );
-    const response = await fetch(request);
+  const getUsers = async (requestUrl: string) => {
+    const response = await get(requestUrl);
     setLastRequestedUrl(requestUrl);
     console.debug({response});
     const responseBody = await response.json();
@@ -38,11 +33,7 @@ export default function UsersList() {
   }
 
   useEffect(() => {
-    console.debug("useEffect[url, token]");
-    if (!token) {
-      console.warn("No token, page should not load");
-      return;
-    }
+    console.debug("useEffect[url]");
     if (url.base === undefined) {
       console.debug("Current URL undefined", {url});
       return;
@@ -50,13 +41,13 @@ export default function UsersList() {
       console.debug({url});
       const formedUrl = `${url.base}${url.options.curr ? `?${url.options.curr}`: ""}`
       if (formedUrl !== lastRequestedUrl) {
-        console.debug({formedUrl, lastRequestedUrl, token})
-        getUsers(formedUrl, token);
+        console.debug({formedUrl, lastRequestedUrl})
+        getUsers(formedUrl);
       } else {
         console.debug("Stopped request duplication")
       }
     }
-  }, [url, token]);
+  }, [url]);
 
   useEffect(() => {
     console.debug({users});
