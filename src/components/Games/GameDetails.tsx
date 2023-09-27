@@ -28,6 +28,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
   const [error, setError] = useState<string | null>();
   const [reload, setReload] = useState(true);
   const [joining, setJoining] = useState(false);
+  const [moving, setMoving] = useState(false);
 
   console.debug({ gameId });
 
@@ -59,6 +60,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
 
   const onMoveClick = async (rowIndex: number, columnIndex: number) => {
     if (!currentGame) return;
+    setMoving(true);
     const response = await post(`https://tictactoe.aboutdream.io/games/${gameId}/move/`, {row: rowIndex, col: columnIndex});
     console.debug({response});
     try {
@@ -67,10 +69,13 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
       if (responseBody.errors.length) {
         const errors: ApiError[] = responseBody.errors;
         setError(errors[0].message);
+      } else {
+        setError(null);
       }
     } catch (e) {
       console.error({e});
     }
+    setMoving(false);
     setReload(true);
   }
 
@@ -104,6 +109,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
             canUserJoin && <button onClick={onJoinClick} disabled={joining}>{joining ? "Joining" : "Join game"}</button>
           }
           <button onClick={() => setGameId(null)}>Back</button>
+          <button onClick={() => {setReload(true); setError(null)}}>Refresh board state</button>
           <p>Created at {(new Date(currentGame.created)).toLocaleString()}</p>
           <p>Status: {getGameStatusText(currentGame.status)}</p>
           <p>First player: {currentGame.first_player.username}</p>
@@ -113,7 +119,7 @@ export default function GameDetails({ get, post, gameId, setGameId }: GameDetail
               <BoardLayout
                 board={currentGame.board}
                 players={{firstPlayer: currentGame.first_player.id, secondPlayer: currentGame.second_player?.id}}
-                canMakeMove={isUserParticipating}
+                canMakeMove={isUserParticipating && !moving}
                 onMoveClick={onMoveClick}/>
             </div>
           }
