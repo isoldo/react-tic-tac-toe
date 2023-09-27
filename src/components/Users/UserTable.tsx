@@ -8,7 +8,6 @@ interface UserTableProps {
 
 export default function UserTable({ users }: UserTableProps) {
   const rowProps = users.map((user) => {return { user }});
-  console.debug({rowProps});
 
   return (
     <Table items={rowProps} rowComponent={UserTableRow}/>

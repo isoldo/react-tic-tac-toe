@@ -15,7 +15,6 @@ export default function RegisterForm() {
   }
 
   const registerButtonClicked = async () => {
-    console.debug({username, password, repeatedPassword, match: isPasswordMatch()});
     const body = { username, password };
     const request = new Request("https://tictactoe.aboutdream.io/register/",
       {
@@ -28,7 +27,6 @@ export default function RegisterForm() {
     );
 
     const response = await fetch(request);
-    console.debug({response});
     if (response.status !== 200) {
       console.error("Error while registering user", {status: response.status, username, password});
       const responseBody = await response.json();

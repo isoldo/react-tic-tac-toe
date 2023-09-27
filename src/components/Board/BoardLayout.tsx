@@ -16,17 +16,12 @@ interface  BoardLayoutProps {
 }
 
 export default function BoardLayout({ players, marks = {firstPlayer: "X", secondPlayer: "O"}, board, canMakeMove, onMoveClick }: BoardLayoutProps) {
-
-  board.map((br) => console.debug({br}));
-
   const firstPlayer = players.firstPlayer;
   const secondPlayer = players.secondPlayer;
   const idMap = {
     [firstPlayer]: marks.firstPlayer,
     [secondPlayer ?? -1]: marks.secondPlayer
   }
-
-  console.debug({idMap});
 
   return (
     <div>
