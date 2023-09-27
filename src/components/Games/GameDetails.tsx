@@ -18,11 +18,11 @@ interface GameDetailsProps {
   get: (url: string) => Promise<Response>;
   post: (url: string, body: Record<string, unknown>) => Promise<Response>;
   gameId: number;
+  userId: number | null;
   setGameId: (id: number | null) => void;
 }
 
-export default function GameDetails({ get, post, gameId, setGameId }: GameDetailsProps) {
-  const { id: userId } = useUser();
+export default function GameDetails({ get, post, gameId, userId, setGameId}: GameDetailsProps) {
   const [currentGame, setCurrentGame] = useState<Game>();
   const [isUserParticipating, setIsUserParticipating] = useState(false);
   const [error, setError] = useState<string | null>();
