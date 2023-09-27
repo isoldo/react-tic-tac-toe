@@ -5,10 +5,11 @@ import GameTableRow from "./GamesTableRow";
 interface GameTableProps {
   games: Game[];
   setGameId: (id: number) => void;
+  userId: number | null;
 }
 
-export default function GameTable({ games, setGameId }: GameTableProps) {
-  const rowProps = games.map((g) => {return { game: g, setGameId}});
+export default function GameTable({ games, setGameId, userId }: GameTableProps) {
+  const rowProps = games.map((g) => {return { game: g, setGameId, userId}});
   console.debug({rowProps});
 
   return (

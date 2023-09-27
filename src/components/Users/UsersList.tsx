@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useUser } from "../../hooks/useUser";
 import UserTable from "./UserTable";
 import { Url, UserData } from "../../types";
 

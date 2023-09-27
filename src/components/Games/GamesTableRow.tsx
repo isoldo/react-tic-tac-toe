@@ -1,13 +1,12 @@
-import { useUser } from "../../hooks/useUser";
 import { Game } from "../../types";
 
 interface GameTableRowProps {
   game: Game;
+  userId: number | null;
   setGameId: (id: number) => void;
 }
 
-export default function GameTableRow({game, setGameId}: GameTableRowProps) {
-  const { id: userId } = useUser();
+export default function GameTableRow({game, setGameId, userId}: GameTableRowProps) {
   const { id, first_player, second_player, status } = game;
 
   const currentUser = (userId === first_player.id) || (second_player?.id === userId);

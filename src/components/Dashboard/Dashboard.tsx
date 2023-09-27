@@ -56,7 +56,7 @@ export default function Dashboard() {
       <button onClick={() => { setLogout(true) }}>Logout</button>
     </div>
     {
-      gameId && <GameDetails get={get} post={post} gameId={gameId} setGameId={setGameId}/>
+      gameId && <GameDetails get={get} post={post} gameId={gameId} setGameId={setGameId} userId={id}/>
       ||
       <>
         <div>

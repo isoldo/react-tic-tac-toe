@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useUser } from "../../hooks/useUser";
 import GameTable from "./GamesTable";
 import { Filter, FilterValues, Game, Url } from "../../types";
 import { gameStatusMapper } from "../../utils/gameStatusMapper";
@@ -13,7 +12,7 @@ interface GameListProps {
   setGameId: (id: number | null) => void;
 }
 
-export default function GamesList({ get, post, setGameId }: GameListProps) {
+export default function GamesList({ get, post, setGameId, userId }: GameListProps) {
   const [url, setUrl] = useState<Url>({
     base: `https://tictactoe.aboutdream.io/games/`,
     options: {
@@ -110,7 +109,7 @@ export default function GamesList({ get, post, setGameId }: GameListProps) {
             )
           })}
         </select>
-        { games && <GameTable games={games} setGameId={setGameId}/>}
+        { games && <GameTable games={games} setGameId={setGameId} userId={userId}/>}
         <button disabled={!url.options.prev} onClick={onPrevButtonClick}>Prev</button>
         <button disabled={!url.options.next} onClick={onNextButtonClick}>Next</button>
       </div>
