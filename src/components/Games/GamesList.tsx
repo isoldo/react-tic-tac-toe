@@ -7,11 +7,13 @@ import { gameStatusMapper } from "../../utils/gameStatusMapper";
 const GAMES_PER_PAGE = 10;
 
 interface GameListProps {
+  userId: number | null;
   get: (url: string) => Promise<Response>;
   post: (url: string, body: Record<string, unknown>) => Promise<Response>;
+  setGameId: (id: number | null) => void;
 }
 
-export default function GamesList({ get, post }: GameListProps) {
+export default function GamesList({ get, post, setGameId }: GameListProps) {
   const [url, setUrl] = useState<Url>({
     base: `https://tictactoe.aboutdream.io/games/`,
     options: {
@@ -108,7 +110,7 @@ export default function GamesList({ get, post }: GameListProps) {
             )
           })}
         </select>
-        { games && <GameTable games={games}/>}
+        { games && <GameTable games={games} setGameId={setGameId}/>}
         <button disabled={!url.options.prev} onClick={onPrevButtonClick}>Prev</button>
         <button disabled={!url.options.next} onClick={onNextButtonClick}>Next</button>
       </div>

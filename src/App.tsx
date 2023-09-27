@@ -21,9 +21,6 @@ const RoutesJSX = (<>
   <Route path="/register" Component={RegisterForm}/>
   <Route path="/login" Component={LoginForm}/>
   <Route path="/" element={<ProtectedRoute Component={Dashboard}/>}/>
-  <Route path="/games" element={<ProtectedRoute Component={GamesList}/>}/>
-  <Route path="/games/:id" loader={async ({params}) => { return { id: params.id }}} element={<ProtectedRoute Component={GameDetails}/>}/>
-  <Route path="/users" element={<ProtectedRoute Component={UsersList}/>}/>
   </>
 )
 

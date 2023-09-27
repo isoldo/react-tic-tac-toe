@@ -1,4 +1,3 @@
-import { useLoaderData } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
 import { ApiError, Game, Status } from "../../types";
@@ -18,16 +17,17 @@ function getGameStatusText(status: Status) {
 interface GameDetailsProps {
   get: (url: string) => Promise<Response>;
   post: (url: string, body: Record<string, unknown>) => Promise<Response>;
+  gameId: number;
+  setGameId: (id: number | null) => void;
 }
 
-export default function GameDetails({ get, post }: GameDetailsProps) {
-  const { id } = useLoaderData() as { id: number };
+export default function GameDetails({ get, post, gameId, setGameId }: GameDetailsProps) {
   const { id: userId } = useUser();
   const [currentGame, setCurrentGame] = useState<Game>();
   const [isUserParticipating, setIsUserParticipating] = useState(false);
   const [error, setError] = useState<string | null>();
 
-  console.debug({ id });
+  console.debug({ gameId });
 
   const getGame = async(id: number) => {
     const response = await get(`https://tictactoe.aboutdream.io/games/${id}`);
@@ -49,14 +49,14 @@ export default function GameDetails({ get, post }: GameDetailsProps) {
   }, [userId, currentGame]);
 
   useEffect(() => {
-    if (!!id) {
-      getGame(id)
+    if (!!gameId) {
+      getGame(gameId)
     }
-  }, [id]);
+  }, [gameId]);
 
   const onMoveClick = async (rowIndex: number, columnIndex: number) => {
     if (!currentGame) return;
-    const response = await post(`https://tictactoe.aboutdream.io/games/${id}/move/`, {row: rowIndex, col: columnIndex});
+    const response = await post(`https://tictactoe.aboutdream.io/games/${gameId}/move/`, {row: rowIndex, col: columnIndex});
     console.debug({response});
     try {
       const responseBody = await response.json();
@@ -76,7 +76,7 @@ export default function GameDetails({ get, post }: GameDetailsProps) {
   const onJoinClick = async () => {
     if (canUserJoin) {
       const requestBody = {winner: "", first_player: currentGame.first_player.id};
-      const response = await post(`https://tictactoe.aboutdream.io/games/${id}/join/`, requestBody);
+      const response = await post(`https://tictactoe.aboutdream.io/games/${gameId}/join/`, requestBody);
       console.debug({response});
       try {
         const responseBody = await response.json();
@@ -89,13 +89,14 @@ export default function GameDetails({ get, post }: GameDetailsProps) {
 
   return (
     <div>
-      <p>ID: {id}</p>
+      <p>ID: {gameId}</p>
       {
         currentGame &&
         <>
           {
             canUserJoin && <button onClick={onJoinClick}>Join game</button>
           }
+          <button onClick={() => setGameId(null)}>Back</button>
           <p>Created at {(new Date(currentGame.created)).toLocaleString()}</p>
           <p>Status: {getGameStatusText(currentGame.status)}</p>
           <p>First player: {currentGame.first_player.username}</p>
